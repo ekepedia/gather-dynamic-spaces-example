@@ -27,55 +27,6 @@ const port = process.env.PORT || 8000;
 const throttledQueue = require('throttled-queue');
 const throttle = throttledQueue(2, 200, true);
 
-
-// const initSocks = () => {
-//     let {
-//       url, 
-//       API_KEY,
-//       SPACE_ID,
-//       MAP_ID,
-//     } = require("./config-2");
-
-//     axios.post("https://rtr-web.herokuapp.com/api/gather-managed-spaces", {
-//         reference_space_id: SPACE_ID,
-//         api_key: API_KEY,
-//         space_name: MAP_ID[0]
-//     }).then((res) => {
-//         console.log(res.data)
-
-//         if (res.data && res.data.data) {
-//             const gather_space = res.data.data;
-
-//             const {
-//                 gather_space_id,
-//                 gather_space_link,
-//             } = gather_space;
-
-//             console.log("Link to new space:", gather_space_link);
-
-//             SPACE_ID = gather_space_id;
-//             url = gather_space_id;
-
-//             let temp = false;
-
-//             const game = new Game(url, () => Promise.resolve({ apiKey: API_KEY }));
-//             game.connect();
-//             game.subscribeToConnection((connected) => console.log("connected?", connected));
-
-
-//             game.subscribeToEvent("playerMoves", (data, context) => {
-//                 if(temp == false) {
-//                     temp = true;
-//                     console.log('Building hall...');
-//                     buildMainHall(game, MAP_ID);
-//                 }
-//             });
-              
-//             runSocks(game, MAP_ID, SPACE_ID);
-//         }
-//     })
-// }
-
 const initSocks = () => {
     let {
       API_KEY,
