@@ -1,5 +1,5 @@
 
-Run `npm start` to run the server 
+Run `npm install` then `npm start` to run the server 
 
 POST to `https://rtr-web.herokuapp.com/api/gather-managed-spaces` to create new spaces on the fly with the follwing JSON Body
 
