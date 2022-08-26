@@ -1,0 +1,27 @@
+{
+  "name": "gather-websockets",
+  "version": "1.0.0",
+  "description": "gather websockets with lobby function",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc -b && node dist/index.js"
+  },
+  "author": "eke wokocha",
+  "license": "MIT",
+  "dependencies": {
+    "@gathertown/gather-game-client": "^37.0.1",
+    "@types/node": "^18.0.6",
+    "axios": "^0.27.2",
+    "express": "^4.18.1",
+    "googleapis": "^105.0.0",
+    "isomorphic-ws": "^5.0.0",
+    "querystring": "^0.2.1",
+    "throttled-queue": "^2.1.4",
+    "typescript": "^4.7.4",
+    "ws": "^8.8.1",
+    "yargs": "^17.5.1"
+  },
+  "devDependencies": {
+    "@types/yargs": "^17.0.10"
+  }
+}
