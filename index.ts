@@ -32,7 +32,7 @@ const initSocks = () => {
       API_KEY,
       SPACE_ID,
       MAP_ID,
-    } = require("./config-2");
+    } = require("./config");
 
     axios.get(`https://rtr-web.herokuapp.com/api/gather-managed-spaces?active=true&reference_space_id=${SPACE_ID}`).then((res) => {
         console.log(res.data)
