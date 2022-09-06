@@ -13,7 +13,6 @@ import { stringify } from "querystring";
 import { games } from "googleapis/build/src/apis/games";
 global.WebSocket = require("isomorphic-ws");
 
-
 // *** Heroku Online Code (Start) ***
 
 //Initial setup for POSTing
@@ -27,15 +26,61 @@ const port = process.env.PORT || 8000;
 const throttledQueue = require('throttled-queue');
 const throttle = throttledQueue(2, 200, true);
 
-const initSocks = () => {
-    let {
-      API_KEY,
-      SPACE_ID,
-      MAP_ID,
-    } = require("./config");
+//
+// 
+//
+//
+//
+//
+// BEGIN POLLING CODE
+// 
+//
+//
+// 
+//
+//
 
-    axios.get(`https://rtr-web.herokuapp.com/api/gather-managed-spaces?active=true&reference_space_id=${SPACE_ID}`).then((res) => {
-        console.log(res.data)
+// Dictionary to keep track of websocket connection to avoid duplicate connections 
+const POLLING_INTERVAL = 1000;
+const ALL_SPACES = {};
+
+// Iniate new web socket connection for new spaces
+const spawnNewSpace = (API_KEY, SPACE_ID, MAP_ID) => {
+  const gather_space_link = `https://app.gather.town/app/${SPACE_ID}`;
+
+  console.log(`[${SPACE_ID}]:`, "listening to gather space:", gather_space_link);
+
+  // SPACE_ID = gather_space_id;
+  let url = SPACE_ID;
+
+  let temp = false;
+
+  const game = new Game(url, () => Promise.resolve({ apiKey: API_KEY }));
+
+  ALL_SPACES[SPACE_ID] = { game };
+
+  game.connect();
+  game.subscribeToConnection((connected) => console.log(`[${SPACE_ID}]:`,"connected?", connected));
+
+
+  game.subscribeToEvent("playerMoves", (data, context) => {
+      if(temp == false) {
+          temp = true;
+          console.log(`[${SPACE_ID}]:`,'Building hall for:', SPACE_ID);
+          buildMainHall(game, MAP_ID);
+      }
+  });
+
+    
+  runSocks(game, MAP_ID, SPACE_ID);  
+}
+
+// Poll API endpoint
+const pollNewSpaces = (API_KEY, SPACE_ID, MAP_ID, interval) => {
+
+  console.log(`\n\nPolling spaces in for SPACE_ID, ${SPACE_ID}, on interval, ${interval}`);
+
+  axios.get(`https://rtr-web.herokuapp.com/api/gather-managed-spaces?active=true&reference_space_id=${SPACE_ID}`).then((res) => {
 
         if (res.data && res.data.length) {
 
@@ -46,34 +91,46 @@ const initSocks = () => {
                     space_id
                 } = gather_space;
 
-                const gather_space_link = `https://app.gather.town/app/${space_id}`;
+                if (!ALL_SPACES[space_id]) {
+                  console.log(`\n\n!!Spanwing new space for ${space_id}!!\n\n`)
+                  spawnNewSpace(API_KEY, space_id, MAP_ID)
+                } else {
+                  console.log(`${space_id} has already been spawned`);
+                }
 
-                console.log(`[${space_id}]:`, "listening to gather space:", gather_space_link);
-
-                // SPACE_ID = gather_space_id;
-                let url = space_id;
-
-                let temp = false;
-
-                const game = new Game(url, () => Promise.resolve({ apiKey: API_KEY }));
-                game.connect();
-                game.subscribeToConnection((connected) => console.log(`[${space_id}]:`,"connected?", connected));
-
-
-                game.subscribeToEvent("playerMoves", (data, context) => {
-                    if(temp == false) {
-                        temp = true;
-                        console.log(`[${space_id}]:`,'Building hall for:', space_id);
-                        buildMainHall(game, MAP_ID);
-                    }
-                });
-                  
-                runSocks(game, MAP_ID, space_id);
             });            
         }
+
+        setTimeout(() => {
+             pollNewSpaces(API_KEY, SPACE_ID, MAP_ID, interval);
+        }, interval);
     })
 }
 
+// Get config and begin polling process
+const initSocks = () => {
+    let {
+      API_KEY,
+      SPACE_ID,
+      MAP_ID,
+    } = require("./config");
+
+   pollNewSpaces(API_KEY, SPACE_ID, MAP_ID, POLLING_INTERVAL);
+}
+
+//
+// 
+//
+//
+//
+//
+// END POLLING CODE
+// 
+//
+//
+// 
+//
+//
 
 //Builds map with objects listed in config.ts under MAIN_HALL_OBJ
 const raidObjects: { [id: string]: RaidObject } = {};

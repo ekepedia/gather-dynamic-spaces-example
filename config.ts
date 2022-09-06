@@ -11,6 +11,7 @@ module.exports = {
   MAP_ID: [
     "test-room-11"
   ],
+  
   STATUE: {
     "off": "https://cdn.gather.town/storage.googleapis.com/gather-town.appspot.com/internal-dashboard/images/twIKv7bnw-CLPwyfYsO-E",
     "on": "https://cdn.gather.town/storage.googleapis.com/gather-town.appspot.com/internal-dashboard/images/A_4_wAmZIAazGZoGYrCgW"
