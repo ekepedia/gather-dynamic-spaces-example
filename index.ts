@@ -41,27 +41,31 @@ const throttle = throttledQueue(2, 200, true);
 //
 
 // Dictionary to keep track of websocket connection to avoid duplicate connections 
-const POLLING_INTERVAL = 1000;
+const POLLING_INTERVAL = 1000; // in milliseconds
 const ALL_SPACES = {};
 
 // Iniate new web socket connection for new spaces
 const spawnNewSpace = (API_KEY, SPACE_ID, MAP_ID) => {
-  const gather_space_link = `https://app.gather.town/app/${SPACE_ID}`;
 
+  const gather_space_link = `https://app.gather.town/app/${SPACE_ID}`;
   console.log(`[${SPACE_ID}]:`, "listening to gather space:", gather_space_link);
 
-  // SPACE_ID = gather_space_id;
-  let url = SPACE_ID;
-
-  let temp = false;
-
-  const game = new Game(url, () => Promise.resolve({ apiKey: API_KEY }));
-
-  ALL_SPACES[SPACE_ID] = { game };
+  const game = new Game(SPACE_ID, () => Promise.resolve({ apiKey: API_KEY }));
 
   game.connect();
   game.subscribeToConnection((connected) => console.log(`[${SPACE_ID}]:`,"connected?", connected));
 
+  ALL_SPACES[SPACE_ID] = { game };
+
+  //
+  //
+  //
+  // CUSTOM LOGIC
+  //
+  //
+  //
+
+  let temp = false;
 
   game.subscribeToEvent("playerMoves", (data, context) => {
       if(temp == false) {
@@ -72,7 +76,7 @@ const spawnNewSpace = (API_KEY, SPACE_ID, MAP_ID) => {
   });
 
     
-  runSocks(game, MAP_ID, SPACE_ID);  
+  runSocks(game, MAP_ID, SPACE_ID);
 }
 
 // Poll API endpoint
